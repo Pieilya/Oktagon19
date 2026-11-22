@@ -1,11 +1,17 @@
-from app.db import crud
+from fastapi import FastAPI
+from app.api import books, categories
 
-def main():
-    print("=== КАТЕГОРИИ И КНИГИ ===")
-    for cat in crud.get_all_categories():
-        print(f"\n[{cat.id}] {cat.title}:")
-        for book in crud.get_books_by_category(cat.id):
-            print(f"  - {book.title} ({book.price} руб.)")
+app = FastAPI(
+    title="Bookstore API",
+    description="API для работы с книгами и категориями",
+    version="1.0.0"
+)
 
-if __name__ == "__main__":
-    main()
+# Подключаем роутеры
+app.include_router(categories.router)
+app.include_router(books.router)
+
+# Эндпоинт для проверки, что сервис жив
+@app.get("/health", tags=["health"])
+def health_check():
+    return {"status": "ok", "message": "API is running"}
